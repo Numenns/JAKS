@@ -20,6 +20,9 @@ public class CrearEmergencia {
    public Emergencia generarEmergencia(String tEmergencia, int prioridad) {
        int tiempoR = ThreadLocalRandom.current().nextInt(5, 11); 
        id++;
+       
+       
+       
        return new Emergencia(tEmergencia, prioridad, tiempoR, id); 
    }
 }

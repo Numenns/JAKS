@@ -114,7 +114,7 @@ public class Emergencia implements Base{
     
     @Override
     public String toString() {
-        return "Emergencia{" + "tEmergencia=" + tEmergencia + ", prioridad=" + prioridad + ", tiempo=" + tiempo + ", id=" + id + '}';
+        return "Emergencia{" + "" + tEmergencia + "" + prioridad + "" + tiempo + "%05d" + id + '}';
     }
     
 }
