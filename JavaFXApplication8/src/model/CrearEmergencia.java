@@ -5,7 +5,7 @@
 package model;
 
 
-import Data.Emergencia;
+import data.Emergencia;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
