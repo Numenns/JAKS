@@ -8,8 +8,9 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JavaFXApplication8.jar" size="6400" download="eager" />
-    <jar href="lib\Emergencias.jar" size="4507" download="eager" />
+    <jar href="JavaFXApplication8.jar" size="9046" download="eager" />
+    <jar href="lib\Emergencias.jar" size="4467" download="eager" />
+    <jar href="lib\gson-2.8.2.jar" size="232932" download="eager" />
   </resources>
   <jfx:javafx-desc  width="800" height="600" main-class="view.JavaFXApplication8"  name="JavaFXApplication8" />
   <update check="always"/>
