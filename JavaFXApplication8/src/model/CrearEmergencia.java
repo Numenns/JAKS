@@ -7,22 +7,34 @@ package model;
 
 import data.Emergencia;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
+
 
 /**
  *
  * @author Pc
  */
 
-public class CrearEmergencia {
+public class CrearEmergencia implements Runnable{
    
-   private int id = 0; 
+  private final ColaPrioridad <Emergencia> cola;
+    private Random rand = new Random();
+    private String[] tipos = { "Accidente", "Incendio", "Infarto" };
 
-   public Emergencia generarEmergencia(String tEmergencia, int prioridad) {
-       int tiempoR = ThreadLocalRandom.current().nextInt(5, 11); 
-       id++;
-       
-       
-       
-       return new Emergencia(tEmergencia, prioridad, tiempoR, id); 
-   }
+    public CrearEmergenciancias (ColaPrioridad<Emergencia> cola) {
+        this.cola = cola;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            int prioridad = rand.nextInt(10) + 1;
+            String tipo = tipos[rand.nextInt(tipos.length)];
+            int tiempoAtencion = rand.nextInt(6) + 5;
+            Emergencia e = new Emergencia(prioridad, tipo, tiempoAtencion);
+            cola.agregar(e);
+            System.out.println("Nueva emergencia: " + tipo + " con prioridad " + prioridad);
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+        }
+    }
 }

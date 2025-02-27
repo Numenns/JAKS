@@ -12,7 +12,7 @@ import cola.Base;
  */
 public class Emergencia implements Base{
     
-    private String tEmergencia;
+ private String tEmergencia;
     
     private int prioridad;
     

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -25,25 +26,35 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Label label;
+    private final int NUM_CONSULTORIOS = 3; 
 
-    private final int NUM_CONSULTORIOS = 3; // Número de consultorios
+
+
+    
     private List<Consultorio> consultorios;
+    
+    
+    
+    
+     @FXML
+     private void Simulacion(ActionEvent event) {
+     WebEngine webEngine = webview.getEngine();
+
+        // Timeline para actualizar la vista cada 2 segundos
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> actualizarVista(webEngine)));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        // Primera carga de la tabla
+        actualizarVista(webEngine);
+     }
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         consultorios = Arrays.asList(
             new Consultorio(1), new Consultorio(2), new Consultorio(3)
         );
-
-        WebEngine webEngine = webview.getEngine();
-
-        // Timeline para actualizar la vista cada 2 segundos
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> actualizarVista(webEngine)));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-
-        // Primera carga de la tabla
-        actualizarVista(webEngine);
     }
 
     /**
