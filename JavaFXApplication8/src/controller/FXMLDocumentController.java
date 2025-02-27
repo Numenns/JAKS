@@ -5,6 +5,7 @@
  */
 package controller;
 
+import cola.Cola;
 import java.net.URL;
 import java.util.*;
 import javafx.animation.KeyFrame;
@@ -13,9 +14,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
+import model.CrearEmergencia;
 
 /**
  * Controlador de la aplicación JavaFX con WebView y actualización dinámica.
@@ -23,17 +26,25 @@ import javafx.util.Duration;
 public class FXMLDocumentController implements Initializable {
     @FXML
     private WebView webview;
+    
+    @FXML
+    private TextArea textarea;
 
     @FXML
     private Label label;
     private final int NUM_CONSULTORIOS = 3; 
 
 
-
+    
     
     private List<Consultorio> consultorios;
     
     
+    @FXML
+    private void Generar(ActionEvent event) {
+     new Thread(new CrearEmergencia(new Cola<>())).start();
+        System.out.println("Generando emergencias...");
+    }
     
     
      @FXML
