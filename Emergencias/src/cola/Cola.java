@@ -4,6 +4,7 @@
  */
 package cola;
 
+import data.Emergencia;
 import java.util.LinkedList;
 
 /**
@@ -52,4 +53,11 @@ public class Cola<T extends Base> {
     <T extends Object & Base> void aPilar(T elemento) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+    public void agregar(Emergencia e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+  
+  
 }

@@ -8,8 +8,7 @@ package model;
 import data.Emergencia;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Random;
-
-
+import cola.Cola;
 /**
  *
  * @author Pc
@@ -17,24 +16,36 @@ import java.util.Random;
 
 public class CrearEmergencia implements Runnable{
    
-  private final ColaPrioridad <Emergencia> cola;
+  private final Cola<Emergencia> cola;
     private Random rand = new Random();
     private String[] tipos = { "Accidente", "Incendio", "Infarto" };
+    private int[] prioridades = {1, 5, 10}; // Solo 1, 5 y 10
 
-    public CrearEmergenciancias (ColaPrioridad<Emergencia> cola) {
+    public CrearEmergencia(Cola<Emergencia> cola) {
         this.cola = cola;
-    }
-
-    @Override
+    
+}
+@Override
     public void run() {
         while (true) {
-            int prioridad = rand.nextInt(10) + 1;
+            int prioridad = prioridades[rand.nextInt(prioridades.length)]; // Selección aleatoria entre 1, 5 y 10
             String tipo = tipos[rand.nextInt(tipos.length)];
-            int tiempoAtencion = rand.nextInt(6) + 5;
-            Emergencia e = new Emergencia(prioridad, tipo, tiempoAtencion);
+            int tiempoAtencion = rand.nextInt(6) + 5; // Tiempo entre 5 y 10 segundos
+
+            Emergencia e = new Emergencia(tipo, prioridad, tiempoAtencion, generarIdUnico());
             cola.agregar(e);
+
             System.out.println("Nueva emergencia: " + tipo + " con prioridad " + prioridad);
-            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+
+            try {
+                Thread.sleep(1000); // Esperar 1 segundo antes de generar otra emergencia
+            } catch (InterruptedException ignored) {}
         }
     }
+    
+   private int generarIdUnico() {
+        return rand.nextInt(10000); // ID aleatorio entre 0 y 9999
+    } 
+    
+    
 }
