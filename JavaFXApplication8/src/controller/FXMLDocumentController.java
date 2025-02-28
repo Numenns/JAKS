@@ -20,83 +20,130 @@ import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import model.CrearEmergencia;
 
-/**
- * Controlador de la aplicación JavaFX con WebView y actualización dinámica.
- */
 public class FXMLDocumentController implements Initializable {
-    @FXML
-    private WebView webview;
-    
-    @FXML
-    private TextArea textarea;
 
+    @FXML
+    private WebView webview; 
+    @FXML
+    private WebView webdos;  
+
+    @FXML
+    private TextArea textarea1;
+
+    
+    
     @FXML
     private Label label;
-    private final int NUM_CONSULTORIOS = 3; 
 
+    private final int NUM_CONSULTORIOS = 3;
+    private CrearEmergencia crearEmergencia;
+    private Timeline timeline;
 
-    
-    
     private List<Consultorio> consultorios;
-    
-    
-    @FXML
-    private void Generar(ActionEvent event) {
-     new Thread(new CrearEmergencia(new Cola<>())).start();
-        System.out.println("Generando emergencias...");
-    }
-    
-    
-     @FXML
-     private void Simulacion(ActionEvent event) {
-     WebEngine webEngine = webview.getEngine();
-
-        // Timeline para actualizar la vista cada 2 segundos
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> actualizarVista(webEngine)));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-
-        // Primera carga de la tabla
-        actualizarVista(webEngine);
-     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         consultorios = Arrays.asList(
-            new Consultorio(1), new Consultorio(2), new Consultorio(3)
+                new Consultorio(1),
+                new Consultorio(2),
+                new Consultorio(3)
         );
     }
 
-    /**
-     * Actualiza la vista con el estado de los consultorios en la tabla.
-     */
-    private void actualizarVista(WebEngine webEngine) {
-        // Construir el HTML con colores dinámicos
-        String htmlContent = "<html><head><style>"
-                + "table { width: 100%; border-collapse: collapse; }"
-                + "th, td { border: 1px solid black; padding: 8px; text-align: center; }"
-                + "th { background-color: #f2f2f2; }"
-                + "</style></head><body>"
-                + "<h2>Estado de Consultorios</h2>"
-                + generarHTML()
-                + "</body></html>";
+    @FXML
+    private void finalizar(ActionEvent event) {
+        if (crearEmergencia != null) {
+            crearEmergencia.detener();
+            System.out.println("Generación de emergencias detenida.");
+        }
+    }
 
-        // Cargar el contenido en WebView
+   
+    
+    @FXML
+    private void Generar(ActionEvent event) {
+        new Thread(new CrearEmergencia(new Cola<>())).start();
+        System.out.println("Generando emergencias...");
+    }@FXML
+    private void Simulacion(ActionEvent event) {
+        WebEngine webEngine1 = webview.getEngine();
+        WebEngine webEngine2 = webdos.getEngine();
+
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            actualizarVista(webEngine1, "Estado de Consultorios");
+            actualizarVista(webEngine2, "Listado de emergencias");
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        actualizarVista(webEngine1, "Estado de Consultorios");
+        actualizarVista(webEngine2, "Listado de emergencias");
+
+        if (crearEmergencia == null || !Thread.currentThread().isAlive()) {
+            crearEmergencia = new CrearEmergencia(new Cola<>());
+            new Thread(crearEmergencia).start();
+            System.out.println("Generando emergencias...");
+        }
+    }
+
+    private void actualizarVista(WebEngine webEngine, String titulo) {
+        boolean esTablaEmergencias = titulo.equals("Listado de emergencias");
+        String htmlContent = generarHTML(titulo, esTablaEmergencias);
         webEngine.loadContent(htmlContent, "text/html");
     }
 
-    /**
-     * Genera la tabla HTML con el estado de los consultorios.
-     */
-    private String generarHTML() {
-        StringBuilder tablaHTML = new StringBuilder();
-        tablaHTML.append("<table>")
-                .append("<tr><th>Consultorio</th><th>Estado</th><th>Emergencia</th><th>Tiempo</th><th>Nivel Prioridad</th><th>ID</th></tr>");
+    private String generarHTML(String titulo, boolean esTablaEmergencias) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><head><style>")
+            .append("table { width: 100%; border-collapse: collapse; }")
+            .append("th, td { border: 1px solid black; padding: 8px; text-align: center; }")
+            .append("th { background-color: #f2f2f2; }");
 
-        for (Consultorio c : consultorios) {
-            String bgColor = c.estaOcupado() ? "red" : "green";
-            tablaHTML.append("<tr style='background-color: ").append(bgColor).append(";'>")
+        if (esTablaEmergencias) {
+            html.append("th:nth-child(1), td:nth-child(1) { width: 25%; }") // Emergencia
+                .append("th:nth-child(2), td:nth-child(2) { width: 20%; }") // Tiempo
+                .append("th:nth-child(3), td:nth-child(3) { width: 15%; }") // NivelPrioridad (más pequeño)
+                .append("th:nth-child(4), td:nth-child(4) { width: 40%; }"); // ID (más grande)
+        } else {
+            html.append("th, td { width: calc(100% / 6); }");  // Todas iguales en la primera tabla
+        }
+
+        html.append("</style></head><body>")
+            .append("<h2>").append(titulo).append("</h2>")
+            .append("<table>");
+
+        if (esTablaEmergencias) {
+            html.append("<tr><th>Emergencia</th><th>Tiempo</th><th>NivelPrioridad</th><th>ID</th></tr>");
+
+            int filas = 0;
+            for (Consultorio c : consultorios) {
+                if (c.getEmergencia() != null && filas < 5) {
+                    html.append("<tr>")
+                        .append("<td>").append(c.getEmergencia().tEmergencia).append("</td>")
+                        .append("<td>").append(c.getEmergencia().tiempo).append("</td>")
+                        .append("<td>").append(c.getEmergencia().nPrioridad).append("</td>")
+                        .append("<td>").append(c.getEmergencia().id).append("</td>")
+                        .append("</tr>");
+                    filas++;
+                }
+            }
+
+            while (filas < 5) {
+                html.append("<tr>")
+                    .append("<td>-</td>")
+                    .append("<td>-</td>")
+                    .append("<td>-</td>")
+                    .append("<td>-</td>")
+                    .append("</tr>");
+                filas++;
+            }
+
+        } else {
+            html.append("<tr><th>Consultorio</th><th>Estado</th><th>Emergencia</th><th>Tiempo</th><th>NivelPrioridad</th><th>ID</th></tr>");
+
+            for (Consultorio c : consultorios) {
+                String bgColor = c.estaOcupado() ? "red" : "green";
+                html.append("<tr style='background-color:").append(bgColor).append(";'>")
                     .append("<td>").append(c.getId()).append("</td>")
                     .append("<td>").append(c.estaOcupado() ? "Ocupado" : "Disponible").append("</td>")
                     .append("<td>").append(c.getEmergencia() != null ? c.getEmergencia().tEmergencia : "-").append("</td>")
@@ -104,15 +151,15 @@ public class FXMLDocumentController implements Initializable {
                     .append("<td>").append(c.getEmergencia() != null ? c.getEmergencia().nPrioridad : "-").append("</td>")
                     .append("<td>").append(c.getEmergencia() != null ? c.getEmergencia().id : "-").append("</td>")
                     .append("</tr>");
+            }
         }
 
-        tablaHTML.append("</table>");
-        return tablaHTML.toString();
-    }
-}
+        html.append("</table></body></html>");
+        return html.toString();
+    }}
 
 /**
- * Clase que representa un consultorio.
+ * Clase Consultorio - representa un consultorio con una emergencia asignada o libre.
  */
 class Consultorio {
     private int id;
@@ -145,7 +192,7 @@ class Consultorio {
 }
 
 /**
- * Clase que representa una emergencia en la tabla.
+ * Clase Tabla - representa la información de una emergencia.
  */
 class Tabla {
     int nPrioridad;

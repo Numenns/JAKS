@@ -20,14 +20,16 @@ public class CrearEmergencia implements Runnable {
     private String[] tipos = {"Accidente", "Incendio", "Infarto"};
     private int[] prioridades = {1, 5, 10}; // Solo 1, 5 y 10
     private static int contador = 1;  // Inicia desde 1
-
+    private boolean funciona = true;
+            
+            
     public CrearEmergencia(Cola<Emergencia> cola) {
         this.cola = cola;
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (funciona) {
             int prioridad = prioridades[rand.nextInt(prioridades.length)]; // Selección aleatoria entre 1, 5 y 10
             String tipo = tipos[rand.nextInt(tipos.length)];
             int tiempoAtencion = rand.nextInt(6) + 5; // Tiempo entre 5 y 10 segundos
@@ -42,8 +44,14 @@ public class CrearEmergencia implements Runnable {
             try {
                 Thread.sleep(1000); // Esperar 1 segundo antes de generar otra emergencia
             } catch (InterruptedException ignored) {
+                break;
             }
         }
+    }
+    
+    public void detener() {
+        funciona = false;
+        Thread.currentThread().interrupt();
     }
 
     private int generarIdUnico() {
